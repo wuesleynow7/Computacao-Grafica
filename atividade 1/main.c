@@ -1,16 +1,51 @@
 #include "ppmstruct.h"
+#include <stdio.h>
 
 int main(){
 
 
-   
+    char mapa[MAX_LINHAS][MAX_COLUNAS];
+    int linhas, colunas;
+    
 
-    //aplicando o carimbo com transparencia a duas imagens 
-    image* imagemDestino2 = carregaArquivo("xena_p3.ppm");
-    image* carimbo = carregaArquivo("shapes_p3.ppm");
-    carimbaImagem(imagemDestino2,carimbo, 60,45,1,255,255,255);
-    salvaImagem(imagemDestino2,"xena_carimbo_transparente.ppm");
+    if (carregaMapa("maze.txt", mapa, &linhas, &colunas)==0) {
+        printf("nao consegui carregar o mapa\n");
+        return 1;
+    }
 
+    carregaMapa("maze.txt", mapa, &linhas, &colunas);
+
+    // Ajustando um pouco o “por isso tenho que declarar”: você declara porque precisa de um lugar para guardar o que a função retorna. Se você só chamasse:
+    // carregaArquivo("arbusto.ppm"); se fosse declarado assim ela carregaria a imagem... e perderia o endereço
+    // a imagem seria criada na memória (pelo malloc lá dentro), mas você não teria 
+    // como chegar até ela depois. É como alguém te passar o endereço de uma casa e 
+    // você não anotar.
+
+    // Dentro do carregaArquivo, o malloc cria a image de verdade, e a função devolve só o endereço dela. 
+    // O arbusto é o papel onde você anota esse endereço. Por isso depois você usa arbusto->largura: a seta 
+    // quer dizer “vá até o endereço e pegue o campo”.
+    image* arbusto = carregaArquivo("arbusto.ppm");
+    image* chao = carregaArquivo("chao.ppm");
+
+    if (arbusto == NULL || chao == NULL) {
+        printf("erro nos tiles\n");
+        return 1; 
+    } 
+
+    image* destino = montaLabirinto(mapa, linhas, colunas, arbusto,chao);
+
+    salvaImagem(destino, "mazemontado_2.ppm");
+    apaga(arbusto);
+    apaga(chao);
+    apaga(destino);
+
+
+
+    //############# aplicando o carimbo com transparencia a duas imagens ################
+    // image* imagemDestino2 = carregaArquivo("xena_p3.ppm");
+    // image* carimbo = carregaArquivo("shapes_p3.ppm");
+    // carimbaImagem(imagemDestino2,carimbo, 60,45,1,255,255,255);
+    // salvaImagem(imagemDestino2,"xena_carimbo_transparente.ppm");
 
     //############## testar salvar arquivo_p6 #########################
     // image* a = carregaArquivo("shapes_p3.ppm");

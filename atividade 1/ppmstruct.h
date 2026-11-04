@@ -1,7 +1,8 @@
 #ifndef PPMSTRUCT_H       // Evita inclusões múltiplas
 #define PPMSTRUCT_H
-#define MAX_LINHAS 100
-#define MAX_COLUNAS 100
+#define MAX_LINHAS 256
+#define MAX_COLUNAS 256
+#define MAX_TILES 20
 
 // Protótipo da função (só declaração, sem corpo) também vai as structs
 // convenção: x = índice de linha (0..altura-1), y = índice de coluna (0..largura-1)
@@ -24,6 +25,11 @@ typedef struct image{
 
 } image;
 
+typedef struct tile {
+    char simbolo;
+    image* img;
+} tile;
+
 
 //codigo fornecido
 image* inicializa(image* imagem, int largura, int altura);
@@ -42,5 +48,7 @@ int get_green(image* figura, int x, int y);
 int get_blue(image* figura, int x, int y);
 void carimbaImagem(image* figura_destino, image* carimbo, int coordenada_x_figura_destino, int coordenada_y_figura_destino, int transparencia, int tr,int tg, int tb);
 int carregaMapa(const char* nomeDoArquivo, char mapa[MAX_LINHAS][MAX_COLUNAS], int* linhas, int* colunas);
+image* montaLabirinto(char mapa[MAX_LINHAS][MAX_COLUNAS], int linhas, int colunas, image* arbusto, image* chao);
+int carregaDicionario(const char* nomeDoArquivo, tile dicionario[MAX_TILES]);
 
 #endif

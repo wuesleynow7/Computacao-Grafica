@@ -343,13 +343,96 @@ void carimbaImagem(image* figura_destino, image* carimbo, int coordenada_x_figur
 
 int carregaMapa(const char* nomeDoArquivo, char mapa[MAX_LINHAS][MAX_COLUNAS], int* linhas, int* colunas){
 
+    //variaveis que vamos precisar
     FILE* arquivo;
+    char buffer[MAX_COLUNAS + 2];//é assim pq tenho que descartar o \n e \0
+    int tamanho;// quantos caracteres a linha tem de verdade
+    int k; //posicao dentro das linhas
+    int l,c;//usados só para limpar a matriz
+
     arquivo = fopen(nomeDoArquivo,"r");
 
     if (arquivo == NULL) {
     printf("erro ao abrir o arquivo\n");
-    return NULL;
+    return 0;
+    }
+    //int* linhas, int* colunas sao duas variaveis que armazenao enderecos de memoria na qual so podem armazenar valores inteiros
+
+    //Vá até o endereço para o qual linhas aponta e coloque o valor zero na variável que está lá.
+    *linhas = 0; // conteudo do endereco para a qual linha aponta
+    *colunas = 0;// conteudo do endereco para a qual linha aponta
+
+
+    for (l = 0;l < MAX_LINHAS; l++) {
+        for (c = 0;c < MAX_COLUNAS; c++){
+            mapa[l][c] = ' ';
+        }
     }
 
 
+    //fgets(onde_guardar, tamanho_maximo, de_qual_arquivo) lê uma linha do arquivo e precisa de um lugar para colocar o texto que leu. Esse lugar é o buffer:
+    // um vetor de char temporário, uma “bandeja” onde a linha chega antes de você decidir o que fazer com ela.
+     /*
+     Por que não ler direto para mapa[linha]? Por dois motivos:
+    1) A linha chega com um '\n' no fim e com um '\0' depois dele. Uma linha da matriz só tem MAX_COLUNAS posições,
+    então esses dois caracteres a mais não cabem. É por isso que o buffer tem MAX_COLUNAS + 2.
+
+    2) Você precisa medir a linha e tirar o '\n' antes de guardar. Isso é mais fácil de fazer na bandeja do que dentro da matriz.
+
+    Fluxo de cada volta: a linha chega ao buffer, você mede, copia só os caracteres do labirinto para o mapa e o buffer é reaproveitado para a próxima linha.
+    */
+    while (*linhas < MAX_LINHAS && fgets(buffer, sizeof buffer, arquivo) != NULL) {
+    
+        tamanho = strcspn(buffer,"\r\n");
+
+        for (k=0; k< tamanho && k < MAX_COLUNAS; k++) {
+            mapa[*linhas][k] = buffer[k];
+        }
+        if (tamanho>*colunas) {
+            *colunas = tamanho;
+        }
+            *linhas = *linhas + 1;
+
+    }
+    fclose(arquivo);
+    return 1;
+}
+
+image* montaLabirinto(char mapa[MAX_LINHAS][MAX_COLUNAS], int linhas, int colunas, image* arbusto, image* chao){
+
+    int alturaTile = arbusto->altura;
+    int larguraTile = arbusto->largura;
+
+    image* labirinto = malloc(sizeof(*labirinto));
+    labirinto = inicializa(labirinto, colunas*larguraTile, linhas*alturaTile);
+
+    for (int l=0; l<linhas; l++) {
+        for (int c=0; c<colunas; c++) {
+            int x = l*alturaTile;
+            int y = c*larguraTile;
+
+            if (mapa[l][c] == '#') {
+                carimbaImagem(labirinto,arbusto, x, y,0, 0, 0, 0);
+            }
+            else if (mapa[l][c] == '.') {
+                carimbaImagem(labirinto,chao, x, y,0, 0, 0, 0);
+            }
+        }
+    }
+   return labirinto;
+}
+
+int carregaDicionario(const char* nomeDoArquivo, tile dicionario[MAX_TILES]){
+
+    FILE* arquivo;
+    arquivo = fopen(nomeDoArquivo, "r");
+
+    if (arquivo == NULL) {
+    printf("erro ao abrir o arquivo\n");
+    return 0;
+    }
+
+    int n = 0;
+
+    return 1;
 }

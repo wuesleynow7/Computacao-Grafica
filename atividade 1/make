@@ -1,0 +1,6 @@
+libppm.a: ppmstruct.c ppmstruct.h
+	gcc -c -Wall ppmstruct.c -o ppmstruct.o
+	ar rcs libppm.a ppmstruct.o
+
+clean:
+	rm -f ppmstruct.o libppm.a
