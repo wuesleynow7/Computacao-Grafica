@@ -151,7 +151,7 @@ GLfloat mat_shininess[] = { 64.0f };
 
 GLfloat cam_eye[]    = { 0.0f, 1.5f, 4.0f };
 GLfloat cam_center[] = { 0.0f, 0.5f, 0.0f };
-GLfloat cam_up[]     = { 0.0f, 1.0f, 0.0f };
+GLfloat cam_up[]     = { 0.0f, -1.0f, 0.0f };
 
 float angle = 0.0f; // "static float", a mesma coisa.
 
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    centralizaEEscala(&objeto, 5.0f);   // maior dimensão = 5.0, centrado na origem
+    centralizaEEscala(&objeto, 1.0f);   // maior dimensão = 5.0, centrado na origem
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);

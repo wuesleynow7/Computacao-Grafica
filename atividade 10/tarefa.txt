@@ -1,0 +1,6 @@
+Crie um visualizador de arquivos obj utilizando como base o código fornecido. 
+Pesquise e implemente os callbacks de mouse e teclado. Seu visualizador deverá 
+permitir passar o nome do arquivo como argumento (lembre-se que apenas objetos sem 
+coordenadas de textura e normais são aceitos pelo nosso leitor - você pode melhorá-lo, 
+mas não é o caso aqui). Após carregado, utilize o mouse para rotacionar o objeto, aproximar 
+e afastar, e o teclado para mover (translação). 

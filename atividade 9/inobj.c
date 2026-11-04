@@ -1,0 +1,239 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <GL/freeglut_std.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include <GL/glut.h>
+
+
+#define MAX_VERTICES 100000
+#define MAX_FACES    200000
+
+typedef struct {
+    float x, y, z;
+} Vertex;
+
+typedef struct {
+    int v1, v2, v3;
+} Face;
+
+int loadOBJ(const char *filename, Vertex *vertices, int *numVertices,Face *faces, int *numFaces){
+
+    FILE *file = fopen(filename, "r");
+    if (!file)
+        return 0;
+
+    char line[256];
+    *numVertices = 0;
+    *numFaces = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        if (strncmp(line, "v ", 2) == 0) {
+            Vertex v;
+            if (sscanf(line, "v %f %f %f", &v.x, &v.y, &v.z) == 3) {
+                vertices[*numVertices] = v;
+                (*numVertices)++;
+            }
+        }
+        else if (strncmp(line, "f ", 2) == 0) {
+            Face f;
+            if (sscanf(line, "f %d %d %d", &f.v1, &f.v2, &f.v3) == 3) {
+                faces[*numFaces] = f;
+                (*numFaces)++;
+            }
+        }
+    }
+
+    fclose(file);
+    return 1;
+}
+
+
+//############################## opengl
+
+
+int window_width  = 800;  // "static int" evitaria que outros códigos do mesmo projeto vejam estas variáveis
+int window_height = 600;
+
+GLfloat light0_position[] = { 50.0f, 50.0f, 50.0f, 1.0f }; // x,y,z,w = 1 , luz pontual
+GLfloat light0_ambient[]  = { 0.15f, 0.15f, 0.15f, 1.0f };
+GLfloat light0_diffuse[]  = { 0.80f, 0.80f, 0.80f, 1.0f };
+GLfloat light0_specular[] = { 1.00f, 1.00f, 1.00f, 1.0f };
+
+GLfloat global_ambient[]  = { 0.05f, 0.05f, 0.05f, 1.0f };
+
+
+GLfloat mat_ambient[]   = { 0.1f, 0.1f, 0.2f, 1.0f }; 
+GLfloat mat_diffuse[]   = { 0.2f, 0.3f, 0.8f, 1.0f }; 
+GLfloat mat_specular[]  = { 0.9f, 0.9f, 0.9f, 1.0f }; 
+GLfloat mat_shininess[] = { 64.0f };                   
+
+GLfloat cam_eye[]    = { 0.0f, 1.5f, 4.0f };
+GLfloat cam_center[] = { 0.0f, 0.5f, 0.0f };
+GLfloat cam_up[]     = { 0.0f, 1.0f, 0.0f };
+
+float angle = 0.0f; // "static float", a mesma coisa.
+
+void meuinit(void)
+{
+    glEnable(GL_DEPTH_TEST);    
+    glShadeModel(GL_SMOOTH);    
+    glEnable(GL_NORMALIZE);     
+
+    // Iluminacao global 
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); // modelo de observador local para LUZ especular
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  light0_ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  light0_diffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light0_specular);
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+
+         glEnable(GL_COLOR_MATERIAL);
+       glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    
+}
+
+
+void reshape(int w, int h)
+{
+    window_width = w;
+    window_height = (h == 0) ? 1 : h;
+    glViewport(0, 0, window_width, window_height);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60.0, (GLdouble)window_width / (GLdouble)window_height, 0.1, 100.0);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
+void display(void){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // glulookat configra a matriz de visualizacao
+    glMatrixMode(GL_MODELVIEW);
+    
+	glLoadIdentity();
+    gluLookAt(cam_eye[0], cam_eye[1], cam_eye[2],
+              cam_center[0], cam_center[1], cam_center[2],
+              cam_up[0], cam_up[1], cam_up[2]);
+
+        glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+
+    
+    glPushMatrix();
+      glDisable(GL_LIGHTING); // chao simples
+//      glColor3f(0.2f, 0.2f, 0.2f);
+      glBegin(GL_LINES);
+        for (int i = -10; i <= 10; i++) {
+            glColor3f((GLfloat)(i+10)/20, (GLfloat)(i+20)/30,(GLfloat)(i+40)/50);
+            glVertex3f((GLfloat)i, 0.0f, -10.0f);
+            glVertex3f((GLfloat)i, 0.0f,  10.0f);
+            glVertex3f(-10.0f, 0.0f, (GLfloat)i);
+            glVertex3f( 10.0f, 0.0f, (GLfloat)i);
+        }
+      glEnd();
+      glEnable(GL_LIGHTING);
+    glPopMatrix();
+    
+ //   glPushMatrix();
+ //   glTranslatef(2.0f, 0.0f, 0.0f); 
+ //   glRotatef(angle, 0.0f, 1.0f, 0.0f);
+
+ //bully
+    glPushMatrix();
+      glTranslatef(-2.0f, 0.5f, 0.0f); 
+      glRotatef(angle, 0.0f, 1.0f, 0.0f);
+	  glColor3f(1.0f, 0.0f, 0.0f);
+	  //glutSolidSphere(0.7, 36, 36);
+	  glutSolidTeapot(0.6);
+    glPopMatrix();
+//  glPopMatrix();
+
+// dado de RPG
+//     glPushMatrix();
+//       glTranslatef(1.0f, 0.5f, 0.0f); 
+//       glRotatef(angle, 0.0f, 1.0f, 0.0f);
+// 	  glColor3f(1.0f, 0.0f, 0.0f);
+// 	  //glutSolidSphere(0.7, 36, 36);
+// 	  //glutSolidTeapot(0.6);
+//       glutSolidIcosahedron();
+//     glPopMatrix();
+// //  glPopMatrix();
+
+    glutSwapBuffers();
+}
+
+
+void idleFunc(void){
+    angle += 2.2f;
+    if (angle > 360.0f) angle -= 360.0f;
+    glutPostRedisplay();
+}
+
+
+void keyboard(unsigned char key, int x, int y){
+    (void)x; (void)y;
+    if (key == 27 || key == 'q' || key == 'Q') { // ESC ou Q sai 
+        exit(0);
+    }
+}
+
+
+void desenhaElefante(){
+
+    glBegin(GL_TRIANGLES);
+    for (int i =0; i<MAX_FACES; i++) {
+        
+    }
+}
+
+int main(int argc, char** argv){
+
+    Vertex vertices[MAX_FACES];
+    Face faces[MAX_FACES];
+    int numFaces,numVertices;
+
+    loadOBJ("elephant.obj", vertices, &numVertices, faces, &numFaces);
+
+    if (!loadOBJ("elephant.obj", vertices, &numVertices, faces, &numFaces)) {
+    printf("Erro ao abrir elephant.obj\n");
+    return 1;
+    }
+    printf("Vertices: %d | Faces: %d\n", numVertices, numFaces);
+
+    
+
+
+
+
+
+
+
+
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(window_width, window_height);
+    glutCreateWindow("bulezinho exemplo");
+
+    meuinit();
+
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutIdleFunc(idleFunc);
+
+    glutMainLoop();
+    return 0;
+}
