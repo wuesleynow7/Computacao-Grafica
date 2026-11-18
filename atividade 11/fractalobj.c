@@ -3,6 +3,122 @@
 #include <math.h>
 #include <time.h>
 
+
+typedef struct {
+    float x, y, z;
+} Vec3;
+
+typedef struct {
+    int v1, v2, v3;      
+} Face;
+
+typedef struct {
+    Vec3 *vertices;
+    Vec3 *normais;      
+    Face *faces;
+    int numVertices;
+    int numFaces;
+} Objeto3D;
+
+Objeto3D objeto = {0};   // objeto global, carregado no main
+
+
+static Vec3 normalFace(Vec3 a, Vec3 b, Vec3 c)
+{
+    Vec3 u = { b.x - a.x, b.y - a.y, b.z - a.z };
+    Vec3 w = { c.x - a.x, c.y - a.y, c.z - a.z };
+    Vec3 n = { u.y * w.z - u.z * w.y,
+               u.z * w.x - u.x * w.z,
+               u.x * w.y - u.y * w.x };
+    float len = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+    if (len > 1e-12f) {
+        n.x /= len; n.y /= len; n.z /= len;
+    }
+    return n;
+}
+
+/* ---------- carregamento do OBJ ---------- */
+
+int loadOBJ(const char *arquivo_nome, Objeto3D *obj)
+{
+    FILE *arquivo = fopen(arquivo_nome, "r");
+    if (!arquivo)
+        return 0;
+
+    char line[256];
+
+    obj->numVertices = 0;
+    obj->numFaces = 0;
+
+    // 1a passada: contando v e f para poder alocar dinamicamente os vetores
+    while (fgets(line, sizeof(line), arquivo)) {
+        if (strncmp(line, "v ", 2) == 0)
+            obj->numVertices++;
+        else if (strncmp(line, "f ", 2) == 0)
+            obj->numFaces++;
+    }
+
+    obj->vertices = malloc(obj->numVertices * sizeof(Vec3));
+    obj->faces    = malloc(obj->numFaces * sizeof(Face));
+    obj->normais  = malloc(obj->numFaces * sizeof(Vec3));
+
+    // 2a passada: popula a struct
+   fseek(arquivo, 0, SEEK_SET);  // volta para o inicio do arquivo
+    int nv = 0, nf = 0;
+
+    while (fgets(line, sizeof(line), arquivo)) {
+        if (strncmp(line, "v ", 2) == 0) {
+            Vec3 v;
+            if (sscanf(line, " v %f %f %f", &v.x, &v.y, &v.z) == 3) {
+                obj->vertices[nv] = v;
+                nv++;
+            }
+        }
+        else if (strncmp(line, "f ", 2) == 0) {
+            Face f;
+            if (sscanf(line, "f %d %d %d", &f.v1, &f.v2, &f.v3) == 3) {
+                f.v1--; f.v2--; f.v3--;      
+                obj->faces[nf] = f;
+                // calcula a normal da face, popula a struct e ja normaliza o vetor normal
+                obj->normais[nf] = normalFace(obj->vertices[f.v1],
+                                              obj->vertices[f.v2],
+                                              obj->vertices[f.v3]);
+                nf++;
+            }
+        }
+    }
+
+    fclose(arquivo);
+    obj->numVertices = nv;
+    obj->numFaces = nf;
+    return 1;
+}
+
+void liberaObjeto(void)
+{
+    free(objeto.vertices);
+    free(objeto.normais);
+    free(objeto.faces);
+}
+
+//----------------- como vizualizar o objeto -----------------
+/*
+usando o codigo do teapot
+use a funcao loadOBJ("terreno.obj", &objeto) para carregar o objeto
+
+
+
+
+// compile: gcc -o fractalobj fractalobj.c -lm
+// execute: ./fractalobj 
+*/
+              
+
+
+
+
+
+
 double** fracland(int n, double escala, double decaimento) {
     int tam = (int)pow(2, n) + 1;
     double** grid = (double**)malloc(tam * sizeof(double*));
