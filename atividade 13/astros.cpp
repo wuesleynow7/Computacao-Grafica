@@ -440,7 +440,7 @@ int main(int argc, char **argv)
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize (500, 500);
+    glutInitWindowSize (100, 100);
     glutInitWindowPosition (100, 100);
     glutCreateWindow (argv[0]);
     glEnable (GL_BLEND | GL_DEPTH_TEST);
