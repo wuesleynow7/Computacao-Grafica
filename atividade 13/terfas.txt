@@ -1,0 +1,23 @@
+Atividade 13 — Sistema Solar 3D
+
+Tarefas
+
+1. Texturas
+   - Obter as texturas do Sol, da Lua de Júpiter e dos demais planetas.
+   - Organizar os arquivos de imagem na pasta da atividade.
+
+2. Iluminação e animação
+   - Posicionar a fonte de luz no Sol.
+   - Configurar GL_LIGHT1 em função da posição solar.
+   - Simular as órbitas dos planetas e da Lua de Júpiter.
+   - Utilizar GLPushMatrix() e GLPopMatrix() para representar corretamente a hierarquia das transformações.
+
+3. Órbitas
+   - Ajustar os períodos relativos das órbitas.
+   - Manter proporções coerentes entre os tempos de cada astro.
+   - Movimentar os corpos celestes de forma contínua e uniforme.
+
+4. Relatório
+   - Produzir um relatório com uma ou duas páginas.
+   - Descrever os objetivos, a hierarquia utilizada, a iluminação e os resultados obtidos.
+   - Entregar o relatório no Classroom.
