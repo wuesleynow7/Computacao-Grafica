@@ -1,0 +1,17 @@
+ATIVIDADE 14 — SIMULAÇÃO DE LANÇAMENTO
+
+Objetivos
+
+1. Realizar múltiplos lançamentos na mesma simulação.
+
+2. Permitir que o usuário escolha a deformação do estilingue
+   utilizando o mouse.
+
+3. Incorporar a mecânica desenvolvida em uma simulação construída
+   com OpenGL.
+
+Observação
+
+A simulação deverá demonstrar a deformação inicial, o lançamento do
+projétil e o movimento balístico, podendo ser reiniciada ou repetida
+com diferentes parâmetros.
