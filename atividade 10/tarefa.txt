@@ -4,3 +4,13 @@ permitir passar o nome do arquivo como argumento (lembre-se que apenas objetos s
 coordenadas de textura e normais são aceitos pelo nosso leitor - você pode melhorá-lo, 
 mas não é o caso aqui). Após carregado, utilize o mouse para rotacionar o objeto, aproximar 
 e afastar, e o teclado para mover (translação). 
+
+
+
+
+# Para se autoavaliar antes da prova
+1) Qual a diferença entre glutMotionFunc e glutPassiveMotionFunc?
+2) Por que as setas não chegam no glutKeyboardFunc?
+3) Por que as variáveis de rotação, zoom e translação precisam ser globais?
+4) Por que a translação e a escala feitas em centralizaEEscala não exigem recalcular as normais? E uma escala não uniforme exigiria?
+5) Para que serve o glEnable(GL_NORMALIZE) nesse código?

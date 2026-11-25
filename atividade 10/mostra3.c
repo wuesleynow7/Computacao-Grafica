@@ -1,4 +1,4 @@
-// gcc -o teapot teapot.c -lGL -lGLU -lglut -lm
+// gcc -o mostra3  mostra3.c -lGL -lGLU -lglut -lm
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -149,9 +149,9 @@ GLfloat mat_diffuse[]   = { 0.2f, 0.3f, 0.8f, 1.0f };
 GLfloat mat_specular[]  = { 0.9f, 0.9f, 0.9f, 1.0f };
 GLfloat mat_shininess[] = { 64.0f };
 
-GLfloat cam_eye[]    = { 0.0f, 1.5f, 4.0f };
-GLfloat cam_center[] = { 0.0f, 0.5f, 0.0f };
-GLfloat cam_up[]     = { 0.0f, -1.0f, 0.0f };
+GLfloat cam_eye[]    = { 0.0f, 1.5f, 4.0f };//onde a camera esta
+GLfloat cam_center[] = { 0.0f, 0.5f, 0.0f };//para onde a camera olha
+GLfloat cam_up[]     = { 0.0f, -1.0f, 0.0f };//qual direção é "para cima" na foto
 
 float angle = 0.0f; // "static float", a mesma coisa.
 
@@ -244,9 +244,10 @@ void display(void)
     glutSwapBuffers();
 }
 
-void idleFunc(void)
+//responsavel por girar o objeto
+void idleFunc(void) 
 {
-    angle += 1.0f;
+    angle += 1.0f; //velocidade 
     if (angle > 360.0f) angle -= 360.0f;
     glutPostRedisplay();
 }
